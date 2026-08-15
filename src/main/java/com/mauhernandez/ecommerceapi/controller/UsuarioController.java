@@ -1,5 +1,6 @@
 package com.mauhernandez.ecommerceapi.controller;
 
+import com.mauhernandez.ecommerceapi.dto.PromoverRolRequest;
 import com.mauhernandez.ecommerceapi.dto.UsuarioMapper;
 import com.mauhernandez.ecommerceapi.dto.UsuarioRequest;
 import com.mauhernandez.ecommerceapi.dto.UsuarioResponse;
@@ -51,5 +52,11 @@ public class UsuarioController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         usuarioService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/rol")
+    public ResponseEntity<UsuarioResponse> promoverRol(@PathVariable Long id, @Valid @RequestBody PromoverRolRequest request) {
+        Usuario actualizado = usuarioService.promoverA(id, request.rol());
+        return ResponseEntity.ok(usuarioMapper.toResponse(actualizado));
     }
 }

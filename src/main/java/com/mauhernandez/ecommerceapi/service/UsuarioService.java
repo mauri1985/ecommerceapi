@@ -1,6 +1,7 @@
 package com.mauhernandez.ecommerceapi.service;
 
 import com.mauhernandez.ecommerceapi.exception.ConflictoDeNegocioException;
+import com.mauhernandez.ecommerceapi.exception.RecursoNoEncontradoException;
 import com.mauhernandez.ecommerceapi.model.Usuario;
 import com.mauhernandez.ecommerceapi.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,14 @@ public class UsuarioService {
 
     public void eliminar(Long id) {
         usuarioRepository.deleteById(id);
+    }
+
+    public Usuario promoverA(Long id, String nuevoRol) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con id: " + id));
+
+        Usuario.Rol rol = Usuario.Rol.valueOf(nuevoRol.toUpperCase());
+        usuario.setRol(rol);
+        return usuarioRepository.save(usuario);
     }
 }
