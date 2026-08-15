@@ -38,6 +38,11 @@ public class GlobalExceptionHandler {
         return construirRespuesta(HttpStatus.BAD_REQUEST, "Error", List.of(ex.getMessage()));
     }
 
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleCredencialesInvalidas(org.springframework.security.authentication.BadCredentialsException ex) {
+        return construirRespuesta(HttpStatus.UNAUTHORIZED, "No autorizado", List.of(ex.getMessage()));
+    }
+
     private ResponseEntity<ErrorResponse> construirRespuesta(HttpStatus status, String error, List<String> mensajes) {
         ErrorResponse body = new ErrorResponse(LocalDateTime.now(), status.value(), error, mensajes);
         return ResponseEntity.status(status).body(body);
