@@ -4,6 +4,8 @@ import com.mauhernandez.ecommerceapi.exception.RecursoNoEncontradoException;
 import com.mauhernandez.ecommerceapi.model.Producto;
 import com.mauhernandez.ecommerceapi.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,21 @@ public class ProductoService {
 
     public Optional<Producto> buscarPorId(Long id) {
         return productoRepository.findById(id);
+    }
+
+    public Page<Producto> listarActivosPaginado(Pageable pageable) {
+        return productoRepository.findByActivoTrue(pageable);
+    }
+
+    public Page<Producto> listarPorCategoriaPaginado(Long categoriaId, Pageable pageable) {
+        return productoRepository.findByCategoriaIdAndActivoTrue(categoriaId, pageable);
+    }
+
+    public Page<Producto> buscar(String nombre, Long categoriaId, Pageable pageable) {
+        if (categoriaId != null) {
+            return productoRepository.findByCategoriaIdAndActivoTrueAndNombreContainingIgnoreCase(categoriaId, nombre, pageable);
+        }
+        return productoRepository.findByActivoTrueAndNombreContainingIgnoreCase(nombre, pageable);
     }
 
     public Producto guardar(Producto producto) {

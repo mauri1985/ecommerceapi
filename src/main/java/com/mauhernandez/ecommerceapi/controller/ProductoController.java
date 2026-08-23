@@ -1,5 +1,6 @@
 package com.mauhernandez.ecommerceapi.controller;
 
+import com.mauhernandez.ecommerceapi.dto.PageResponse;
 import com.mauhernandez.ecommerceapi.dto.ProductoMapper;
 import com.mauhernandez.ecommerceapi.dto.ProductoRequest;
 import com.mauhernandez.ecommerceapi.dto.ProductoResponse;
@@ -10,6 +11,9 @@ import com.mauhernandez.ecommerceapi.service.ImagenService;
 import com.mauhernandez.ecommerceapi.service.ProductoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,16 +39,34 @@ public class ProductoController {
     }
 
     @GetMapping
-    public List<ProductoResponse> listar(@RequestParam(required = false) Long categoriaId) {
-        List<Producto> productos = categoriaId != null
-                ? productoService.listarPorCategoria(categoriaId)
-                : productoService.listarActivos();
+    public PageResponse<ProductoResponse> listar(
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size) {
 
-        return productos.stream()
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Producto> pagina;
+        if (q != null && !q.isBlank()) {
+            pagina = productoService.buscar(q, categoriaId, pageable);
+        } else if (categoriaId != null) {
+            pagina = productoService.listarPorCategoriaPaginado(categoriaId, pageable);
+        } else {
+            pagina = productoService.listarActivosPaginado(pageable);
+        }
+
+        List<ProductoResponse> contenido = pagina.getContent().stream()
                 .map(p -> productoMapper.toResponse(p, imagenService.listarPorProducto(p.getId())))
                 .toList();
-    }
 
+        return new PageResponse<>(
+                contenido,
+                pagina.getNumber(),
+                pagina.getTotalPages(),
+                pagina.getTotalElements()
+        );
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductoResponse> buscarPorId(@PathVariable Long id) {
