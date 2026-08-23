@@ -51,6 +51,14 @@ public class CarritoService {
                 });
     }
 
+    public CarritoItem actualizarCantidad(Long carritoItemId, Integer cantidad) {
+        CarritoItem item = carritoItemRepository.findById(carritoItemId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Ítem de carrito no encontrado con id: " + carritoItemId));
+
+        item.setCantidad(cantidad);
+        return carritoItemRepository.save(item);
+    }
+
     public void quitarItem(Long carritoItemId) {
         carritoItemRepository.deleteById(carritoItemId);
     }

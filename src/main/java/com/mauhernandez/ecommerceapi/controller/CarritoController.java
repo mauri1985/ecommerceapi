@@ -1,5 +1,6 @@
 package com.mauhernandez.ecommerceapi.controller;
 
+import com.mauhernandez.ecommerceapi.dto.CarritoItemActualizarRequest;
 import com.mauhernandez.ecommerceapi.dto.CarritoItemMapper;
 import com.mauhernandez.ecommerceapi.dto.CarritoItemRequest;
 import com.mauhernandez.ecommerceapi.dto.CarritoItemResponse;
@@ -47,5 +48,13 @@ public class CarritoController {
     public ResponseEntity<Void> vaciar(@PathVariable Long usuarioId) {
         carritoService.vaciarCarrito(usuarioId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/item/{carritoItemId}")
+    public ResponseEntity<CarritoItemResponse> actualizarCantidad(
+            @PathVariable Long carritoItemId,
+            @Valid @RequestBody CarritoItemActualizarRequest request) {
+        var item = carritoService.actualizarCantidad(carritoItemId, request.cantidad());
+        return ResponseEntity.ok(carritoItemMapper.toResponse(item));
     }
 }

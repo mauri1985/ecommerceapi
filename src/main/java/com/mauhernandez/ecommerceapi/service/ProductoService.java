@@ -23,6 +23,10 @@ public class ProductoService {
         return productoRepository.findByActivoTrue();
     }
 
+    public List<Producto> listarPorCategoria(Long categoriaId) {
+        return productoRepository.findByCategoriaIdAndActivoTrue(categoriaId);
+    }
+
     public Optional<Producto> buscarPorId(Long id) {
         return productoRepository.findById(id);
     }

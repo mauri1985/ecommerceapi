@@ -1,8 +1,11 @@
 package com.mauhernandez.ecommerceapi.dto;
 
 import com.mauhernandez.ecommerceapi.model.Categoria;
+import com.mauhernandez.ecommerceapi.model.Imagen;
 import com.mauhernandez.ecommerceapi.model.Producto;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ProductoMapper {
@@ -28,7 +31,9 @@ public class ProductoMapper {
         producto.setAtributos(request.atributos());
     }
 
-    public ProductoResponse toResponse(Producto producto) {
+    public ProductoResponse toResponse(Producto producto, List<Imagen> imagenes) {
+        List<String> urls = imagenes.stream().map(Imagen::getUrl).toList();
+
         return new ProductoResponse(
                 producto.getId(),
                 producto.getNombre(),
@@ -37,7 +42,8 @@ public class ProductoMapper {
                 producto.getStock(),
                 producto.getCategoria() != null ? producto.getCategoria().getNombre() : null,
                 producto.getAtributos(),
-                producto.getActivo()
+                producto.getActivo(),
+                urls
         );
     }
 }

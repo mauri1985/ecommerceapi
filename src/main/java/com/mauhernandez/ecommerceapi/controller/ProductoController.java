@@ -6,6 +6,7 @@ import com.mauhernandez.ecommerceapi.dto.ProductoResponse;
 import com.mauhernandez.ecommerceapi.model.Categoria;
 import com.mauhernandez.ecommerceapi.model.Producto;
 import com.mauhernandez.ecommerceapi.service.CategoriaService;
+import com.mauhernandez.ecommerceapi.service.ImagenService;
 import com.mauhernandez.ecommerceapi.service.ProductoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,28 +21,35 @@ public class ProductoController {
 
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
+    private final ImagenService imagenService;
     private final ProductoMapper productoMapper;
 
     @Autowired
     public ProductoController(ProductoService productoService,
-                              CategoriaService categoriaService,
+                              CategoriaService categoriaService, ImagenService imagenService,
                               ProductoMapper productoMapper) {
         this.productoService = productoService;
         this.categoriaService = categoriaService;
+        this.imagenService = imagenService;
         this.productoMapper = productoMapper;
     }
 
     @GetMapping
-    public List<ProductoResponse> listar() {
-        return productoService.listarActivos().stream()
-                .map(productoMapper::toResponse)
+    public List<ProductoResponse> listar(@RequestParam(required = false) Long categoriaId) {
+        List<Producto> productos = categoriaId != null
+                ? productoService.listarPorCategoria(categoriaId)
+                : productoService.listarActivos();
+
+        return productos.stream()
+                .map(p -> productoMapper.toResponse(p, imagenService.listarPorProducto(p.getId())))
                 .toList();
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductoResponse> buscarPorId(@PathVariable Long id) {
         return productoService.buscarPorId(id)
-                .map(productoMapper::toResponse)
+                .map(p -> productoMapper.toResponse(p, imagenService.listarPorProducto(p.getId())))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -54,7 +62,7 @@ public class ProductoController {
         Producto producto = productoMapper.toEntity(request, categoria);
         Producto guardado = productoService.guardar(producto);
 
-        return ResponseEntity.ok(productoMapper.toResponse(guardado));
+        return ResponseEntity.ok(productoMapper.toResponse(guardado, List.of()));
     }
 
     @PutMapping("/{id}")
@@ -67,7 +75,8 @@ public class ProductoController {
                     productoMapper.actualizarEntity(existente, request, categoria);
                     Producto actualizado = productoService.guardar(existente);
 
-                    return ResponseEntity.ok(productoMapper.toResponse(actualizado));
+                    List<com.mauhernandez.ecommerceapi.model.Imagen> imagenes = imagenService.listarPorProducto(id);
+                    return ResponseEntity.ok(productoMapper.toResponse(actualizado, imagenes));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
