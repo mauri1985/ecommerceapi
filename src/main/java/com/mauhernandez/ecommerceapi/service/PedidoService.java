@@ -61,11 +61,14 @@ public class PedidoService {
             pedidoItem.setPedido(pedido);
             pedidoItem.setProducto(producto);
             pedidoItem.setCantidad(item.getCantidad());
-            pedidoItem.setPrecioUnitario(producto.getPrecio());
+            BigDecimal precioAUsar = (producto.getPrecioOferta() != null && producto.getPrecioOferta().compareTo(producto.getPrecio()) < 0)
+                    ? producto.getPrecioOferta()
+                    : producto.getPrecio();
+            pedidoItem.setPrecioUnitario(precioAUsar);
 
             pedido.getItems().add(pedidoItem);
 
-            total = total.add(producto.getPrecio().multiply(BigDecimal.valueOf(item.getCantidad())));
+            total = total.add(precioAUsar.multiply(BigDecimal.valueOf(item.getCantidad())));
 
             // Descontar stock
             producto.setStock(producto.getStock() - item.getCantidad());

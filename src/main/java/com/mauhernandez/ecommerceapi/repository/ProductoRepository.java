@@ -18,4 +18,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     Page<Producto> findByActivoTrueAndNombreContainingIgnoreCase(String nombre, Pageable pageable);
     Page<Producto> findByCategoriaIdAndActivoTrueAndNombreContainingIgnoreCase(Long categoriaId, String nombre, Pageable pageable);
+
+    List<Producto> findByActivoTrueAndDestacadoTrue();
 }

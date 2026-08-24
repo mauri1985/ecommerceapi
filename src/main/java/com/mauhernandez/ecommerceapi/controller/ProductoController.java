@@ -103,6 +103,13 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/destacados")
+    public List<ProductoResponse> listarDestacados() {
+        return productoService.listarDestacados().stream()
+                .map(p -> productoMapper.toResponse(p, imagenService.listarPorProducto(p.getId())))
+                .toList();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         productoService.eliminar(id);

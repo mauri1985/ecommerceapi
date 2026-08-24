@@ -19,7 +19,13 @@ public class CarritoItemMapper {
 
     public CarritoItemResponse toResponse(CarritoItem item) {
         var producto = item.getProducto();
-        var subtotal = producto.getPrecio().multiply(BigDecimal.valueOf(item.getCantidad()));
+
+        BigDecimal precioAUsar = (producto.getPrecioOferta() != null
+                && producto.getPrecioOferta().compareTo(producto.getPrecio()) < 0)
+                ? producto.getPrecioOferta()
+                : producto.getPrecio();
+
+        var subtotal = precioAUsar.multiply(BigDecimal.valueOf(item.getCantidad()));
 
         List<String> urls = imagenService.listarPorProducto(producto.getId())
                 .stream()
@@ -30,7 +36,7 @@ public class CarritoItemMapper {
                 item.getId(),
                 producto.getId(),
                 producto.getNombre(),
-                producto.getPrecio(),
+                precioAUsar,
                 item.getCantidad(),
                 subtotal,
                 urls

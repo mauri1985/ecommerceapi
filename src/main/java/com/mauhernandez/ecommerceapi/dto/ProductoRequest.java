@@ -22,5 +22,10 @@ public record ProductoRequest(
         @NotNull(message = "La categoría es obligatoria")
         Long categoriaId,
 
-        Map<String, Object> atributos
+        Map<String, Object> atributos,
+
+        @DecimalMin(value = "0.0", inclusive = false, message = "El precio de oferta debe ser mayor a 0")
+        BigDecimal precioOferta,
+
+        Boolean destacado
 ) {}

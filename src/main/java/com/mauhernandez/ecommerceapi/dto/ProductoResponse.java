@@ -9,9 +9,12 @@ public record ProductoResponse(
         String nombre,
         String descripcion,
         BigDecimal precio,
+        BigDecimal precioOferta,
+        Integer porcentajeDescuento,
         Integer stock,
         String categoriaNombre,
         Map<String, Object> atributos,
         Boolean activo,
-        List<String> imagenes
+        List<String> imagenes,
+        Boolean destacado
 ) {}

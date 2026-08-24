@@ -44,4 +44,9 @@ public class Producto {
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private Boolean destacado = false;
+
+    private BigDecimal precioOferta;
 }

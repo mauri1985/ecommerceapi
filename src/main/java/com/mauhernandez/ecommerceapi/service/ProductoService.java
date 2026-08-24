@@ -48,6 +48,10 @@ public class ProductoService {
         return productoRepository.findByActivoTrueAndNombreContainingIgnoreCase(nombre, pageable);
     }
 
+    public List<Producto> listarDestacados() {
+        return productoRepository.findByActivoTrueAndDestacadoTrue();
+    }
+
     public Producto guardar(Producto producto) {
         return productoRepository.save(producto);
     }
