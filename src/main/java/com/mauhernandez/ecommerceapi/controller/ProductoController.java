@@ -16,7 +16,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -40,21 +43,28 @@ public class ProductoController {
 
     @GetMapping
     public PageResponse<ProductoResponse> listar(
-            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) List<Long> categoriaIds,
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) BigDecimal precioMin,
+            @RequestParam(required = false) BigDecimal precioMax,
+            @RequestParam(required = false) List<String> atributos,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Producto> pagina;
-        if (q != null && !q.isBlank()) {
-            pagina = productoService.buscar(q, categoriaId, pageable);
-        } else if (categoriaId != null) {
-            pagina = productoService.listarPorCategoriaPaginado(categoriaId, pageable);
-        } else {
-            pagina = productoService.listarActivosPaginado(pageable);
+        Map<String, List<String>> atributosAgrupados = null;
+        if (atributos != null) {
+            atributosAgrupados = atributos.stream()
+                    .map(s -> s.split(":", 2))
+                    .filter(partes -> partes.length == 2)
+                    .collect(Collectors.groupingBy(
+                            partes -> partes[0],
+                            Collectors.mapping(partes -> partes[1], Collectors.toList())
+                    ));
         }
+
+        Page<Producto> pagina = productoService.buscarConFiltros(q, categoriaIds, precioMin, precioMax, atributosAgrupados, pageable);
 
         List<ProductoResponse> contenido = pagina.getContent().stream()
                 .map(p -> productoMapper.toResponse(p, imagenService.listarPorProducto(p.getId())))

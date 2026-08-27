@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.jpa.domain.Specification;
+import com.mauhernandez.ecommerceapi.specification.ProductoSpecifications;
+import java.util.Map;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,9 +46,9 @@ public class ProductoService {
 
     public Page<Producto> buscar(String nombre, Long categoriaId, Pageable pageable) {
         if (categoriaId != null) {
-            return productoRepository.findByCategoriaIdAndActivoTrueAndNombreContainingIgnoreCase(categoriaId, nombre, pageable);
+            return productoRepository.buscarPorNombreOCategoriaYCategoriaId(categoriaId, nombre, pageable);
         }
-        return productoRepository.findByActivoTrueAndNombreContainingIgnoreCase(nombre, pageable);
+        return productoRepository.buscarPorNombreOCategoria(nombre, pageable);
     }
 
     public List<Producto> listarDestacados() {
@@ -62,5 +65,36 @@ public class ProductoService {
 
         producto.setActivo(false);
         productoRepository.save(producto);
+    }
+
+    public Page<Producto> buscarConFiltros(String q, List<Long> categoriaIds, BigDecimal precioMin, BigDecimal precioMax,
+                                           Map<String, List<String>> atributos, Pageable pageable) {
+        Specification<Producto> spec = Specification.where(ProductoSpecifications.activo());
+
+        Specification<Producto> filtroCategorias = ProductoSpecifications.categoriaIdEnLista(categoriaIds);
+        if (filtroCategorias != null) {
+            spec = spec.and(filtroCategorias);
+        }
+
+        Specification<Producto> filtroBusqueda = ProductoSpecifications.nombreOCategoriaContiene(q);
+        if (filtroBusqueda != null) {
+            spec = spec.and(filtroBusqueda);
+        }
+
+        Specification<Producto> filtroPrecio = ProductoSpecifications.precioEntre(precioMin, precioMax);
+        if (filtroPrecio != null) {
+            spec = spec.and(filtroPrecio);
+        }
+
+        if (atributos != null) {
+            for (var entry : atributos.entrySet()) {
+                Specification<Producto> filtroAtributo = ProductoSpecifications.tieneAtributo(entry.getKey(), entry.getValue());
+                if (filtroAtributo != null) {
+                    spec = spec.and(filtroAtributo);
+                }
+            }
+        }
+
+        return productoRepository.findAll(spec, pageable);
     }
 }
