@@ -40,6 +40,9 @@ public class ProductoMapper {
 
     public ProductoResponse toResponse(Producto producto, List<Imagen> imagenes) {
         List<String> urls = imagenes.stream().map(Imagen::getUrl).toList();
+        List<ImagenInfo> imagenesInfo = imagenes.stream()
+                .map(img -> new ImagenInfo(img.getId(), img.getUrl()))
+                .toList();
 
         Integer porcentajeDescuento = null;
         if (producto.getPrecioOferta() != null && producto.getPrecioOferta().compareTo(producto.getPrecio()) < 0) {
@@ -62,7 +65,8 @@ public class ProductoMapper {
                 producto.getAtributos(),
                 producto.getActivo(),
                 urls,
-                producto.getDestacado()
+                producto.getDestacado(),
+                imagenesInfo
         );
     }
 }

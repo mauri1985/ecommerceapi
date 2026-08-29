@@ -4,6 +4,7 @@ import com.mauhernandez.ecommerceapi.model.Imagen;
 import com.mauhernandez.ecommerceapi.repository.ImagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,5 +28,19 @@ public class ImagenService {
 
     public void eliminar(Long id) {
         imagenRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void marcarComoPortada(Long productoId, Long imagenId) {
+        List<Imagen> imagenes = imagenRepository.findByProductoIdOrderByOrdenAsc(productoId);
+
+        for (Imagen img : imagenes) {
+            if (img.getId().equals(imagenId)) {
+                img.setOrden(0);
+            } else if (img.getOrden() == 0) {
+                img.setOrden(1);
+            }
+            imagenRepository.save(img);
+        }
     }
 }

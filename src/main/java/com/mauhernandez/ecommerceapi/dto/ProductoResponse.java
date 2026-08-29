@@ -16,5 +16,6 @@ public record ProductoResponse(
         Map<String, Object> atributos,
         Boolean activo,
         List<String> imagenes,
-        Boolean destacado
+        Boolean destacado,
+        List<ImagenInfo> imagenesCompletas
 ) {}
