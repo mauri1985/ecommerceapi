@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET = "cambiar-esta-clave-por-una-bien-larga-y-secreta-1234567890";
-    private static final long EXPIRACION_MS = 1000 * 60 * 60 * 10; // 10 horas
+    private static final long EXPIRACION_MS = 1000 * 60 * 60 * 1; // 1 hora
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
