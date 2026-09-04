@@ -36,9 +36,4 @@ public class PagoController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/retorno")
-    public ResponseEntity<Void> retorno(@RequestParam String resultado) {
-        String destino = frontendUrl + "/pedidos?pago=" + resultado;
-        return ResponseEntity.status(302).location(java.net.URI.create(destino)).build();
-    }
 }
