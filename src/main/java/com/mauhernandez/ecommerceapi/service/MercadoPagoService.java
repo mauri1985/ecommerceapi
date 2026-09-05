@@ -50,7 +50,7 @@ public class MercadoPagoService {
             PreferenceRequest request = PreferenceRequest.builder()
                     .items(items)
                     .backUrls(backUrls)
-                    //.autoReturn("approved") //TODO: Volver a activar cuando se haga el deploy
+                    .autoReturn("approved")
                     .externalReference(pedido.getId().toString())
                     .notificationUrl(backendUrl + "/api/pagos/webhook")
                     .build();
