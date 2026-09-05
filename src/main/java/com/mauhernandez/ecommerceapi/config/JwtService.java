@@ -8,15 +8,17 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class JwtService {
+    @Value("${jwt.secret}")
+    private String secret;
 
-    private static final String SECRET = "cambiar-esta-clave-por-una-bien-larga-y-secreta-1234567890";
     private static final long EXPIRACION_MS = 1000 * 60 * 60 * 1; // 1 hora
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generarToken(String email) {
