@@ -1,4 +1,4 @@
-package com.mauhernandez.ecommerce_api.config;
+package com.mauhernandez.ecommerceapi.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
