@@ -4,10 +4,12 @@ import com.mauhernandez.ecommerceapi.exception.ConflictoDeNegocioException;
 import com.mauhernandez.ecommerceapi.model.*;
 import com.mauhernandez.ecommerceapi.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -95,6 +97,20 @@ public class PedidoService {
             Producto producto = item.getProducto();
             producto.setStock(producto.getStock() + item.getCantidad());
             productoService.guardar(producto);
+        }
+    }
+
+    @Scheduled(fixedRate = 15 * 60 * 1000) // corre cada 15 minutos
+    @Transactional
+    public void cancelarPedidosAbandonados() {
+        LocalDateTime limite = LocalDateTime.now().minusMinutes(30);
+
+        List<Pedido> pendientesViejos = pedidoRepository.findByEstadoAndFechaBefore(Pedido.Estado.PENDIENTE, limite);
+
+        for (Pedido pedido : pendientesViejos) {
+            restaurarStock(pedido.getId());
+            pedido.setEstado(Pedido.Estado.CANCELADO);
+            pedidoRepository.save(pedido);
         }
     }
 }
