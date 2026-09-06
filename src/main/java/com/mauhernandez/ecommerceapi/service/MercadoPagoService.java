@@ -25,9 +25,11 @@ public class MercadoPagoService {
     private String backendUrl;
 
     private final PedidoRepository pedidoRepository;
+    private final PedidoService pedidoService;
 
-    public MercadoPagoService(PedidoRepository pedidoRepository) {
+    public MercadoPagoService(PedidoRepository pedidoRepository, PedidoService pedidoService) {
         this.pedidoRepository = pedidoRepository;
+        this.pedidoService = pedidoService;
     }
 
     public String crearPreferencia(Pedido pedido) {
@@ -96,6 +98,7 @@ public class MercadoPagoService {
                 pedido.setEstado(Pedido.Estado.PAGADO);
                 pedidoRepository.save(pedido);
             } else if ("rejected".equals(status)) {
+                pedidoService.restaurarStock(pedidoId);
                 pedido.setEstado(Pedido.Estado.CANCELADO);
                 pedidoRepository.save(pedido);
             }

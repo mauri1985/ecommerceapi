@@ -83,4 +83,18 @@ public class PedidoService {
 
         return guardado;
     }
+
+    @Transactional
+    public void restaurarStock(Long pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElse(null);
+        if (pedido == null || pedido.getEstado() == Pedido.Estado.CANCELADO) {
+            return; // ya cancelado antes, no restauramos dos veces
+        }
+
+        for (PedidoItem item : pedido.getItems()) {
+            Producto producto = item.getProducto();
+            producto.setStock(producto.getStock() + item.getCantidad());
+            productoService.guardar(producto);
+        }
+    }
 }
