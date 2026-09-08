@@ -3,6 +3,7 @@ name: Mantener backend despierto
 on:
   schedule:
     - cron: '*/10 10-23,0-1 * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
