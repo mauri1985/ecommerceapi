@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -48,10 +49,17 @@ public class ProductoController {
             @RequestParam(required = false) BigDecimal precioMin,
             @RequestParam(required = false) BigDecimal precioMax,
             @RequestParam(required = false) List<String> atributos,
+            @RequestParam(required = false) String orden,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = switch (orden == null ? "" : orden) {
+            case "precio_asc" -> Sort.by("precio").ascending();
+            case "precio_desc" -> Sort.by("precio").descending();
+            default -> Sort.unsorted();
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Map<String, List<String>> atributosAgrupados = null;
         if (atributos != null) {
