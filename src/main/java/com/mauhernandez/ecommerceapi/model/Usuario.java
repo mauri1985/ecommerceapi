@@ -23,7 +23,6 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -34,6 +33,9 @@ public class Usuario {
 
     @Column(name = "email_verificado")
     private Boolean emailVerificado = false;
+
+    @Column(name = "proveedor_auth")
+    private String proveedorAuth = "LOCAL"; // "LOCAL" o "GOOGLE"
 
     public enum Rol {
         CLIENTE, ADMIN

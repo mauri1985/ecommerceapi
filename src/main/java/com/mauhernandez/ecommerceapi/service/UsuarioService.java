@@ -88,4 +88,15 @@ public class UsuarioService {
         String base = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
         return base + path;
     }
+
+    public Usuario crearDesdeGoogle(String email, String nombre) {
+        Usuario usuario = new Usuario();
+        usuario.setEmail(email);
+        usuario.setNombre(nombre);
+        usuario.setPassword(null);
+        usuario.setRol(Usuario.Rol.CLIENTE);
+        usuario.setEmailVerificado(true); // Google ya verificó el email por nosotros
+        usuario.setProveedorAuth("GOOGLE");
+        return usuarioRepository.save(usuario);
+    }
 }
