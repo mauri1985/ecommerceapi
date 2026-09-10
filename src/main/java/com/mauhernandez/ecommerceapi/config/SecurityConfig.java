@@ -31,6 +31,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/pagos/webhook").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/usuarios/*/rol").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/test/email").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/verificar-email").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/solicitar-reset").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

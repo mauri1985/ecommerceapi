@@ -32,6 +32,9 @@ public class Usuario {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+    @Column(name = "email_verificado")
+    private Boolean emailVerificado = false;
+
     public enum Rol {
         CLIENTE, ADMIN
     }

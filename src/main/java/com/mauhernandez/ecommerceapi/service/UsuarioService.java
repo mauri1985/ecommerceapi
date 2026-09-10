@@ -2,9 +2,11 @@ package com.mauhernandez.ecommerceapi.service;
 
 import com.mauhernandez.ecommerceapi.exception.ConflictoDeNegocioException;
 import com.mauhernandez.ecommerceapi.exception.RecursoNoEncontradoException;
+import com.mauhernandez.ecommerceapi.model.TokenAccion;
 import com.mauhernandez.ecommerceapi.model.Usuario;
 import com.mauhernandez.ecommerceapi.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +18,18 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final TokenAccionService tokenAccionService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, EmailService emailService, TokenAccionService tokenAccionService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+        this.tokenAccionService = tokenAccionService;
     }
 
     public List<Usuario> listarTodos() {
@@ -40,7 +49,17 @@ public class UsuarioService {
             throw new ConflictoDeNegocioException("Ya existe un usuario registrado con ese email");
         }
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        return usuarioRepository.save(usuario);
+        Usuario guardado = usuarioRepository.save(usuario);
+
+        String token = tokenAccionService.generar(guardado, TokenAccion.Tipo.VERIFICACION_EMAIL);
+        String link = construirLink("/verificar-email?token=" + token);
+        emailService.enviar(
+                guardado.getEmail(),
+                "Confirmá tu cuenta",
+                "¡Bienvenido! Hacé click en este enlace para confirmar tu cuenta:\n\n" + link
+        );
+
+        return guardado;
     }
 
     public void eliminar(Long id) {
@@ -54,5 +73,19 @@ public class UsuarioService {
         Usuario.Rol rol = Usuario.Rol.valueOf(nuevoRol.toUpperCase());
         usuario.setRol(rol);
         return usuarioRepository.save(usuario);
+    }
+
+    public void guardarSinRevalidar(Usuario usuario) {
+        usuarioRepository.save(usuario); // sin chequear email duplicado, ya existe
+    }
+
+    public void cambiarPassword(Usuario usuario, String nuevaPassword) {
+        usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        usuarioRepository.save(usuario);
+    }
+
+    private String construirLink(String path) {
+        String base = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
+        return base + path;
     }
 }
