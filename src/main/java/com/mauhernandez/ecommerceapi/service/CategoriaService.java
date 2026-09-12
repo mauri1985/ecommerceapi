@@ -33,4 +33,17 @@ public class CategoriaService {
     public void eliminar(Long id) {
         categoriaRepository.deleteById(id);
     }
+
+    public List<Long> obtenerIdsConHijos(List<Long> categoriaIds) {
+        List<Long> todos = new java.util.ArrayList<>(categoriaIds);
+
+        for (Long id : categoriaIds) {
+            List<Categoria> hijas = categoriaRepository.findByCategoriaPadreId(id);
+            for (Categoria hija : hijas) {
+                todos.add(hija.getId());
+            }
+        }
+
+        return todos;
+    }
 }

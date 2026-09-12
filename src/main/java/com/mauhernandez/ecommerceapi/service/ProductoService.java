@@ -18,10 +18,12 @@ import java.util.Optional;
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final CategoriaService categoriaService;
 
     @Autowired
-    public ProductoService(ProductoRepository productoRepository) {
+    public ProductoService(ProductoRepository productoRepository, CategoriaService categoriaService) {
         this.productoRepository = productoRepository;
+        this.categoriaService = categoriaService;
     }
 
     public List<Producto> listarActivos() {
@@ -71,9 +73,12 @@ public class ProductoService {
                                            Map<String, List<String>> atributos, Pageable pageable) {
         Specification<Producto> spec = Specification.where(ProductoSpecifications.activo());
 
-        Specification<Producto> filtroCategorias = ProductoSpecifications.categoriaIdEnLista(categoriaIds);
-        if (filtroCategorias != null) {
-            spec = spec.and(filtroCategorias);
+        if (categoriaIds != null && !categoriaIds.isEmpty()) {
+            List<Long> categoriaIdsConHijos = categoriaService.obtenerIdsConHijos(categoriaIds);
+            Specification<Producto> filtroCategorias = ProductoSpecifications.categoriaIdEnLista(categoriaIdsConHijos);
+            if (filtroCategorias != null) {
+                spec = spec.and(filtroCategorias);
+            }
         }
 
         Specification<Producto> filtroBusqueda = ProductoSpecifications.nombreOCategoriaContiene(q);
