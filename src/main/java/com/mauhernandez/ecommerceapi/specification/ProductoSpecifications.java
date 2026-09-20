@@ -56,4 +56,11 @@ public class ProductoSpecifications {
             return cb.or(predicados);
         };
     }
+
+    public static Specification<Producto> conDescuento() {
+        return (root, query, cb) -> cb.and(
+                cb.isNotNull(root.get("precioOferta")),
+                cb.lessThan(root.get("precioOferta"), root.get("precio"))
+        );
+    }
 }

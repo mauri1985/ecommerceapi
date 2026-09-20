@@ -50,6 +50,7 @@ public class ProductoController {
             @RequestParam(required = false) BigDecimal precioMax,
             @RequestParam(required = false) List<String> atributos,
             @RequestParam(required = false) String orden,
+            @RequestParam(required = false) Boolean soloOfertas,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size) {
 
@@ -72,7 +73,7 @@ public class ProductoController {
                     ));
         }
 
-        Page<Producto> pagina = productoService.buscarConFiltros(q, categoriaIds, precioMin, precioMax, atributosAgrupados, pageable);
+        Page<Producto> pagina = productoService.buscarConFiltros(q, categoriaIds, precioMin, precioMax, atributosAgrupados, orden, soloOfertas, pageable);
 
         List<ProductoResponse> contenido = pagina.getContent().stream()
                 .map(p -> productoMapper.toResponse(p, imagenService.listarPorProducto(p.getId())))

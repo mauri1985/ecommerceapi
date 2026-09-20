@@ -70,8 +70,12 @@ public class ProductoService {
     }
 
     public Page<Producto> buscarConFiltros(String q, List<Long> categoriaIds, BigDecimal precioMin, BigDecimal precioMax,
-                                           Map<String, List<String>> atributos, Pageable pageable) {
+                                           Map<String, List<String>> atributos, String orden, Boolean soloOfertas, Pageable pageable) {
         Specification<Producto> spec = Specification.where(ProductoSpecifications.activo());
+
+        if (Boolean.TRUE.equals(soloOfertas)) {
+            spec = spec.and(ProductoSpecifications.conDescuento());
+        }
 
         if (categoriaIds != null && !categoriaIds.isEmpty()) {
             List<Long> categoriaIdsConHijos = categoriaService.obtenerIdsConHijos(categoriaIds);
