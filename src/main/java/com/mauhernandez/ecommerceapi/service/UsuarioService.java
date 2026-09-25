@@ -56,7 +56,7 @@ public class UsuarioService {
         emailService.enviar(
                 guardado.getEmail(),
                 "Confirmá tu cuenta",
-                "¡Bienvenido a MauriShop! Hacé click en este enlace para confirmar tu cuenta:\n\n" + link
+                "¡Bienvenido a EasyShop! Hacé click en este enlace para confirmar tu cuenta:\n\n" + link
         );
 
         return guardado;
