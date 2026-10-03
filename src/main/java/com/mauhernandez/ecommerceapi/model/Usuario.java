@@ -20,10 +20,22 @@ public class Usuario {
     @Column(nullable = false)
     private String nombre;
 
+    @Column
+    private String apellido;
+
     @Column(nullable = false, unique = true)
     private String email;
 
     private String password;
+
+    @Column
+    private String telefono;
+
+    @Column(name = "direccion_calle")
+    private String direccionCalle;
+
+    @Column
+    private String ciudad;
 
     @Enumerated(EnumType.STRING)
     private Rol rol;

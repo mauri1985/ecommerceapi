@@ -1,5 +1,6 @@
 package com.mauhernandez.ecommerceapi.service;
 
+import com.mauhernandez.ecommerceapi.dto.PerfilRequest;
 import com.mauhernandez.ecommerceapi.exception.ConflictoDeNegocioException;
 import com.mauhernandez.ecommerceapi.exception.RecursoNoEncontradoException;
 import com.mauhernandez.ecommerceapi.model.TokenAccion;
@@ -89,14 +90,38 @@ public class UsuarioService {
         return base + path;
     }
 
-    public Usuario crearDesdeGoogle(String email, String nombre) {
+    public Usuario crearDesdeGoogle(String email, String nombre, String apellido) {
         Usuario usuario = new Usuario();
         usuario.setEmail(email);
         usuario.setNombre(nombre);
+        usuario.setApellido(apellido);
         usuario.setPassword(null);
         usuario.setRol(Usuario.Rol.CLIENTE);
-        usuario.setEmailVerificado(true); // Google ya verificó el email por nosotros
+        usuario.setEmailVerificado(true);
         usuario.setProveedorAuth("GOOGLE");
         return usuarioRepository.save(usuario);
+    }
+
+    public Usuario actualizarPerfil(Long id, PerfilRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con id: " + id));
+
+        usuario.setNombre(request.nombre());
+        usuario.setApellido(request.apellido());
+        usuario.setTelefono(request.telefono());
+        usuario.setDireccionCalle(request.direccionCalle());
+        usuario.setCiudad(request.ciudad());
+        return usuarioRepository.save(usuario);
+    }
+
+    public void cambiarPasswordConActual(Long id, String passwordActual, String passwordNueva) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con id: " + id));
+
+        if (usuario.getPassword() == null || !passwordEncoder.matches(passwordActual, usuario.getPassword())) {
+            throw new ConflictoDeNegocioException("La contraseña actual es incorrecta");
+        }
+        usuario.setPassword(passwordEncoder.encode(passwordNueva));
+        usuarioRepository.save(usuario);
     }
 }

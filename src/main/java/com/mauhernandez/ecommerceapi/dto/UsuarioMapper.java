@@ -19,7 +19,11 @@ public class UsuarioMapper {
         return new UsuarioResponse(
                 usuario.getId(),
                 usuario.getNombre(),
+                usuario.getApellido(),
                 usuario.getEmail(),
+                usuario.getTelefono(),
+                usuario.getDireccionCalle(),
+                usuario.getCiudad(),
                 usuario.getRol().name(),
                 usuario.getFechaCreacion()
         );

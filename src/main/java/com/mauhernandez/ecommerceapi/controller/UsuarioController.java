@@ -1,9 +1,6 @@
 package com.mauhernandez.ecommerceapi.controller;
 
-import com.mauhernandez.ecommerceapi.dto.PromoverRolRequest;
-import com.mauhernandez.ecommerceapi.dto.UsuarioMapper;
-import com.mauhernandez.ecommerceapi.dto.UsuarioRequest;
-import com.mauhernandez.ecommerceapi.dto.UsuarioResponse;
+import com.mauhernandez.ecommerceapi.dto.*;
 import com.mauhernandez.ecommerceapi.model.Usuario;
 import com.mauhernandez.ecommerceapi.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -58,5 +55,16 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> promoverRol(@PathVariable Long id, @Valid @RequestBody PromoverRolRequest request) {
         Usuario actualizado = usuarioService.promoverA(id, request.rol());
         return ResponseEntity.ok(usuarioMapper.toResponse(actualizado));
+    }
+
+    @PutMapping("/{id}/perfil")
+    public UsuarioResponse actualizarPerfil(@PathVariable Long id, @Valid @RequestBody PerfilRequest request) {
+        Usuario actualizado = usuarioService.actualizarPerfil(id, request);
+        return usuarioMapper.toResponse(actualizado);
+    }
+
+    @PutMapping("/{id}/cambiar-password")
+    public void cambiarPassword(@PathVariable Long id, @Valid @RequestBody CambiarPasswordRequest request) {
+        usuarioService.cambiarPasswordConActual(id, request.passwordActual(), request.passwordNueva());
     }
 }

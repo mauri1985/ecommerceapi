@@ -48,7 +48,7 @@ public class AuthController {
         }
 
         String token = jwtService.generarToken(usuario.getEmail());
-        return new LoginResponse(usuario.getId(), token, usuario.getEmail(), usuario.getNombre(), usuario.getRol().name());
+        return new LoginResponse(usuario.getId(), token, usuario.getEmail(), usuario.getNombre(), usuario.getApellido(), usuario.getRol().name());
     }
 
     @GetMapping("/verificar-email")
@@ -84,12 +84,18 @@ public class AuthController {
         var payload = googleAuthService.verificar(request.credential());
 
         String email = payload.getEmail();
-        String nombre = (String) payload.get("name");
+        String givenName = (String) payload.get("given_name");
+        String apellido = (String) payload.get("family_name");
+
+        // Algunas cuentas de Google no tienen given_name/family_name separados
+        // (por ejemplo, cuentas corporativas configuradas distinto) — en ese caso,
+        // caemos al nombre completo como respaldo.
+        String nombre = (givenName != null) ? givenName : (String) payload.get("name");
 
         Usuario usuario = usuarioService.buscarPorEmail(email)
-                .orElseGet(() -> usuarioService.crearDesdeGoogle(email, nombre));
+                .orElseGet(() -> usuarioService.crearDesdeGoogle(email, nombre, apellido));
 
         String token = jwtService.generarToken(usuario.getEmail());
-        return new LoginResponse(usuario.getId(), token, usuario.getEmail(), usuario.getNombre(), usuario.getRol().name());
+        return new LoginResponse(usuario.getId(), token, usuario.getEmail(), usuario.getNombre(), usuario.getApellido(), usuario.getRol().name());
     }
 }
