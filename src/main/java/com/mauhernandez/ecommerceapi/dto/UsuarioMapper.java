@@ -25,6 +25,7 @@ public class UsuarioMapper {
                 usuario.getDireccionCalle(),
                 usuario.getCiudad(),
                 usuario.getRol().name(),
+                usuario.getProveedorAuth(),
                 usuario.getFechaCreacion()
         );
     }

@@ -11,5 +11,6 @@ public record UsuarioResponse(
         String direccionCalle,
         String ciudad,
         String rol,
+        String proveedorAuth,
         LocalDateTime fechaCreacion
 ) {}
